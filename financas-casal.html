@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💰 Finanças do Casal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f0d;
+    --surface: #111917;
+    --card: #162118;
+    --border: #1e2e22;
+    --accent: #4ade80;
+    --accent2: #86efac;
+    --accent3: #f97316;
+    --danger: #f43f5e;
+    --text: #e8f5ea;
+    --muted: #6b8f72;
+    --white: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(74,222,128,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 28px 32px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 10;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--accent);
+  }
+  .logo span { color: var(--text); font-weight: 400; font-size: 14px; margin-left: 8px; opacity: 0.5; }
+  .header-date {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  /* NAV */
+  .nav {
+    display: flex;
+    gap: 4px;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    position: relative; z-index: 10;
+    overflow-x: auto;
+  }
+  .nav button {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--muted);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .nav button:hover { color: var(--text); border-color: var(--border); }
+  .nav button.active {
+    background: var(--accent);
+    color: #0a0f0d;
+    border-color: var(--accent);
+  }
+
+  /* CONTENT */
+  .content { padding: 28px 32px; position: relative; z-index: 10; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* CARDS GRID */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--muted); }
+  .card-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .card-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+  .card-value.green { color: var(--accent); }
+  .card-value.red { color: var(--danger); }
+  .card-value.orange { color: var(--accent3); }
+  .card-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .card-tag {
+    position: absolute;
+    top: 12px; right: 12px;
+    font-size: 18px;
+  }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .table-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .table-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text);
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 12px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(30,46,34,0.5);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(74,222,128,0.03); }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .badge.entrada { background: rgba(74,222,128,0.15); color: var(--accent); }
+  .badge.saida { background: rgba(244,63,94,0.15); color: var(--danger); }
+  .badge.fixo { background: rgba(249,115,22,0.15); color: var(--accent3); }
+
+  /* PROGRESS */
+  .progress-wrap { margin: 20px 0; }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .progress-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--accent);
+    transition: width 0.8s ease;
+  }
+  .progress-fill.danger { background: var(--danger); }
+  .progress-fill.warning { background: var(--accent3); }
+
+  /* MONTHLY TABLE */
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .month-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .month-card:hover, .month-card.active { border-color: var(--accent); }
+  .month-card.active { background: rgba(74,222,128,0.08); }
+  .month-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .month-stat { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+  .month-stat span { color: var(--text); float: right; }
+
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  @media(max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  input, select, textarea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 10px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus { border-color: var(--accent); }
+  select option { background: var(--surface); }
+  .btn {
+    background: var(--accent);
+    color: #0a0f0d;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn.danger { background: var(--danger); color: white; }
+  .btn.outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn.outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* YEAR SELECTOR */
+  .year-tabs {
+    display: flex; gap: 8px; margin-bottom: 24px;
+  }
+  .year-tab {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .year-tab:hover { color: var(--text); }
+  .year-tab.active { background: var(--accent); color: #0a0f0d; border-color: var(--accent); }
+
+  /* CHART */
+  .chart-area {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .chart-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 140px;
+  }
+  .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar-pair { display: flex; gap: 3px; align-items: flex-end; width: 100%; justify-content: center; }
+  .bar {
+    width: 14px;
+    border-radius: 3px 3px 0 0;
+    transition: opacity 0.2s;
+    cursor: pointer;
+    min-height: 3px;
+  }
+  .bar:hover { opacity: 0.7; }
+  .bar.entrada { background: var(--accent); }
+  .bar.saida { background: var(--danger); }
+  .bar-label { font-size: 9px; color: var(--muted); text-align: center; }
+  .chart-legend { display: flex; gap: 16px; margin-top: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+  }
+  .empty { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--accent); color: #0a0f0d;
+    padding: 12px 20px; border-radius: 8px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.3s; z-index: 9999;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media(max-width: 600px) {
+    .content { padding: 20px 16px; }
+    .header, .nav { padding-left: 16px; padding-right: 16px; }
+    .cards-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="logo">💚 Finanças<span>do Casal</span></div>
+  </div>
+  <div class="header-date" id="currentDate"></div>
+</div>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('resumo')">📊 Resumo</button>
+  <button onclick="showSection('lancamentos')">📝 Lançamentos</button>
+  <button onclick="showSection('historico')">📅 Histórico</button>
+  <button onclick="showSection('economia')">🏦 Economia</button>
+  <button onclick="showSection('contas')">⚙️ Contas Fixas</button>
+</nav>
+
+<div class="content">
+
+  <!-- RESUMO -->
+  <div class="section active" id="sec-resumo">
+    <div class="section-title">Visão Geral</div>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-tag">💰</div>
+        <div class="card-label">Saldo Atual</div>
+        <div class="card-value green" id="saldo-atual">R$ 0,00</div>
+        <div class="card-sub" id="saldo-mes">Mês atual</div>
+      </div>
+      <div class="card">
+        <div class="card-tag">⬆️</div>
+        <div class="card-label">Entradas do Mês</div>
+        <div class="card-value green" id="entradas-mes">R$ 0,00</div>
+        <div class="card-sub" id="entradas-fixas-sub">Fixas: R$ 6.450,00</div>
+      </div>
+      <div class="card">
+        <div class="card-tag">⬇️</div>
+        <div class="card-label">Saídas do Mês</div>
+        <div class="card-value red" id="saidas-mes">R$ 0,00</div>
+        <div class="card-sub" id="saidas-fixas-sub">Fixas: R$ 3.686,79</div>
+      </div>
+      <div class="card">
+        <div class="card-tag">🏦</div>
+        <div class="card-label">Economia Total</div>
+        <div class="card-value orange" id="economia-total">R$ 0,00</div>
+        <div class="card-sub">Acumulado no ano</div>
+      </div>
+    </div>
+
+    <!-- PROGRESSO -->
+    <div class="table-wrap" style="padding: 20px 24px; margin-bottom: 24px;">
+      <div class="table-title" style="margin-bottom: 16px;">📈 Performance do Mês</div>
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Gastos vs Receita</span>
+          <span id="pct-gasto">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="bar-gasto" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Gastos Fixos vs Receita</span>
+          <span>57%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill warning" style="width:57%"></div>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Meta de Economia (20%)</span>
+          <span id="pct-eco">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="bar-eco" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-area">
+      <div class="chart-title">📊 Entradas vs Saídas — 2025</div>
+      <div class="bar-chart" id="main-chart"></div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Entradas</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div>Saídas</div>
+      </div>
+    </div>
+
+    <!-- ÚLTIMOS LANÇAMENTOS -->
+    <div class="table-wrap">
+      <div class="table-header">
+        <div class="table-title">🕐 Últimos Lançamentos</div>
+      </div>
+      <table>
+        <thead><tr>
+          <th>Data</th><th>Descrição</th><th>Tipo</th><th>Valor</th>
+        </tr></thead>
+        <tbody id="ultimos-lancamentos"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- LANÇAMENTOS -->
+  <div class="section" id="sec-lancamentos">
+    <div class="section-title">Novo Lançamento</div>
+    <div class="table-wrap" style="padding: 24px;">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" id="lanc-data">
+        </div>
+        <div class="form-group">
+          <label>Tipo</label>
+          <select id="lanc-tipo">
+            <option value="entrada">⬆️ Entrada</option>
+            <option value="saida">⬇️ Saída</option>
+            <option value="diario">📆 Diário</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Valor (R$)</label>
+          <input type="number" id="lanc-valor" placeholder="0,00" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <input type="text" id="lanc-desc" placeholder="Ex: Supermercado, Salário...">
+        </div>
+        <div class="form-group">
+          <label>Quem</label>
+          <select id="lanc-quem">
+            <option value="casal">👫 Casal</option>
+            <option value="eu">👤 Eu</option>
+            <option value="conjuge">👤 Cônjuge</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Mês</label>
+          <select id="lanc-mes">
+            <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+            <option value="3">Março</option><option value="4">Abril</option>
+            <option value="5">Maio</option><option value="6">Junho</option>
+            <option value="7">Julho</option><option value="8">Agosto</option>
+            <option value="9">Setembro</option><option value="10">Outubro</option>
+            <option value="11">Novembro</option><option value="12">Dezembro</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" onclick="addLancamento()">+ Adicionar Lançamento</button>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-title" style="font-size:16px;">Lançamentos do Mês</div>
+
+    <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+      <select id="filter-mes" onchange="renderLancamentos()" style="flex:1; min-width:120px;">
+        <option value="">Todos os meses</option>
+        <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+        <option value="3">Março</option><option value="4">Abril</option>
+        <option value="5">Maio</option><option value="6">Junho</option>
+        <option value="7">Julho</option><option value="8">Agosto</option>
+        <option value="9">Setembro</option><option value="10">Outubro</option>
+        <option value="11">Novembro</option><option value="12">Dezembro</option>
+      </select>
+      <select id="filter-tipo" onchange="renderLancamentos()" style="flex:1; min-width:120px;">
+        <option value="">Todos os tipos</option>
+        <option value="entrada">Entradas</option>
+        <option value="saida">Saídas</option>
+        <option value="diario">Diários</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Data</th><th>Descrição</th><th>Tipo</th><th>Quem</th><th>Valor</th><th></th>
+        </tr></thead>
+        <tbody id="lista-lancamentos"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- HISTÓRICO -->
+  <div class="section" id="sec-historico">
+    <div class="section-title">Histórico por Mês</div>
+    <div class="year-tabs">
+      <div class="year-tab active" onclick="setAno(2024, this)">2024</div>
+      <div class="year-tab" onclick="setAno(2025, this)">2025</div>
+      <div class="year-tab" onclick="setAno(2026, this)">2026</div>
+    </div>
+    <div class="month-grid" id="month-grid"></div>
+    <div class="chart-area">
+      <div class="chart-title" id="hist-title">Fluxo do Ano</div>
+      <div class="bar-chart" id="hist-chart"></div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Entradas</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div>Saídas</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ECONOMIA -->
+  <div class="section" id="sec-economia">
+    <div class="section-title">💰 Economia</div>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-tag">🏦</div>
+        <div class="card-label">Economia 2024</div>
+        <div class="card-value orange" id="eco-2024">R$ 1.877,26</div>
+        <div class="card-sub">6,5% das entradas</div>
+      </div>
+      <div class="card">
+        <div class="card-tag">📈</div>
+        <div class="card-label">Economia 2025</div>
+        <div class="card-value orange" id="eco-2025">R$ 697,00</div>
+        <div class="card-sub">0,7% das entradas</div>
+      </div>
+      <div class="card">
+        <div class="card-tag">✨</div>
+        <div class="card-label">Total Acumulado</div>
+        <div class="card-value green" id="eco-total">R$ 2.574,26</div>
+        <div class="card-sub">Soma dos anos</div>
+      </div>
+      <div class="card">
+        <div class="card-tag">🎯</div>
+        <div class="card-label">Meta Mensal</div>
+        <div class="card-value" id="eco-meta">R$ 1.290,00</div>
+        <div class="card-sub">20% das entradas fixas</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-title" style="font-size:16px;">Registrar Economia</div>
+    <div class="table-wrap" style="padding: 24px; margin-bottom: 24px;">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Mês</label>
+          <select id="eco-mes">
+            <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+            <option value="3">Março</option><option value="4">Abril</option>
+            <option value="5">Maio</option><option value="6">Junho</option>
+            <option value="7">Julho</option><option value="8">Agosto</option>
+            <option value="9">Setembro</option><option value="10">Outubro</option>
+            <option value="11">Novembro</option><option value="12">Dezembro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ano</label>
+          <select id="eco-ano">
+            <option>2024</option><option selected>2025</option><option>2026</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Valor Economizado (R$)</label>
+          <input type="number" id="eco-valor" placeholder="0,00" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Onde foi guardado</label>
+          <input type="text" id="eco-local" placeholder="Ex: CDB, Poupança, Tesouro...">
+        </div>
+      </div>
+      <button class="btn" onclick="addEconomia()">+ Registrar Economia</button>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header"><div class="table-title">Histórico de Economias</div></div>
+      <table>
+        <thead><tr><th>Mês/Ano</th><th>Valor</th><th>Onde</th><th></th></tr></thead>
+        <tbody id="lista-economia"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CONTAS FIXAS -->
+  <div class="section" id="sec-contas">
+    <div class="section-title">⚙️ Contas Fixas</div>
+    <div class="cards-grid" style="margin-bottom:24px;">
+      <div class="card">
+        <div class="card-tag">⬆️</div>
+        <div class="card-label">Total Entradas Fixas</div>
+        <div class="card-value green">R$ 6.450,00</div>
+        <div class="card-sub">Salário 1/2 + Salário 2/2</div>
+      </div>
+      <div class="card">
+        <div class="card-tag">⬇️</div>
+        <div class="card-label">Total Saídas Fixas</div>
+        <div class="card-value red">R$ 3.686,79</div>
+        <div class="card-sub">Aluguel + Condomínio + outros</div>
+      </div>
+      <div class="card">
+        <div class="card-tag">✅</div>
+        <div class="card-label">Sobra após Fixos</div>
+        <div class="card-value orange">R$ 2.763,21</div>
+        <div class="card-sub">Para gastos variáveis + economia</div>
+      </div>
+    </div>
+
+    <div class="table-wrap" style="margin-bottom:24px;">
+      <div class="table-header"><div class="table-title">📥 Entradas Fixas</div></div>
+      <table>
+        <thead><tr><th>Vencimento</th><th>Descrição</th><th>Valor</th></tr></thead>
+        <tbody>
+          <tr><td>Todo dia 5</td><td>Salário 1/2</td><td><span class="badge entrada">R$ 5.000,00</span></td></tr>
+          <tr><td>Todo dia 20</td><td>Salário 2/2</td><td><span class="badge entrada">R$ 1.450,00</span></td></tr>
+          <tr><td>Variável (dia 5)</td><td>Salário Variável</td><td><span class="badge entrada">—</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header"><div class="table-title">📤 Saídas Fixas</div></div>
+      <table>
+        <thead><tr><th>Vencimento</th><th>Descrição</th><th>Valor</th></tr></thead>
+        <tbody>
+          <tr><td>Dia 10</td><td>Aluguel</td><td><span class="badge saida">R$ 2.707,00</span></td></tr>
+          <tr><td>Dia 10</td><td>Condomínio</td><td><span class="badge saida">R$ 430,00</span></td></tr>
+          <tr><td>Mensal</td><td>Luz</td><td><span class="badge saida">R$ 130,00</span></td></tr>
+          <tr><td>Crédito mensal</td><td>Internet e Telefone</td><td><span class="badge saida">R$ 331,00</span></td></tr>
+          <tr><td>Crédito mensal</td><td>Spot/Amazon/Outros</td><td><span class="badge saida">R$ 88,79</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- end content -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+const DADOS_2024 = {
+  jan:{e:0,s:0,d:0}, fev:{e:0,s:0,d:0}, mar:{e:0,s:0,d:0},
+  abr:{e:0,s:0,d:0}, mai:{e:0,s:0,d:0}, jun:{e:200,s:200,d:0},
+  jul:{e:1414.61,s:565,d:849}, ago:{e:3196.54,s:2278.91,d:918},
+  set:{e:4213.69,s:4213.69,d:0}, out:{e:4755.08,s:4755.08,d:0},
+  nov:{e:5633.18,s:5633.18,d:0}, dez:{e:9270.19,s:9270.19,d:0}
+};
+const DADOS_2025 = {
+  jan:{e:3921.21,s:514.67,d:3406.54}, fev:{e:3377,s:1961.26,d:1415.74},
+  mar:{e:5444.17,s:2553.9,d:2890.27}, abr:{e:5514.32,s:2738.79,d:2156.56},
+  mai:{e:4009.8,s:2763.28,d:1865.49}, jun:{e:4700.43,s:2679.93,d:2020.5},
+  jul:{e:4226.96,s:3157.12,d:1069.84}, ago:{e:4238.81,s:3059.12,d:1179.69},
+  set:{e:12205.05,s:12205.05,d:0}, out:{e:19573.43,s:19573.43,d:0},
+  nov:{e:23137.22,s:23137.22,d:0}, dez:{e:7759.28,s:7759.28,d:0}
+};
+const DADOS_2026 = {
+  jan:{e:7796.56,s:6989.89,d:2644.51}, fev:{e:7659.26,s:2551.28,d:5115.17},
+  mar:{e:7395,s:5681.8,d:1713.88}, abr:{e:6638.67,s:5779.32,d:650.16},
+  mai:{e:5630,s:5826.64,d:-196.64}, jun:{e:5630,s:3962.56,d:1667.44},
+  jul:{e:5630,s:3883.92,d:1746.08}, ago:{e:5630,s:3883.92,d:1746.08},
+  set:{e:5630,s:3883.92,d:1746.08}, out:{e:5630,s:3706.16,d:1923.84},
+  nov:{e:0,s:0,d:0}, dez:{e:0,s:0,d:0}
+};
+const ALL_DATA = {2024: DADOS_2024, 2025: DADOS_2025, 2026: DADOS_2026};
+const MESES_NOME = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const MESES_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+let lancamentos = JSON.parse(localStorage.getItem('lancamentos') || '[]');
+let economias = JSON.parse(localStorage.getItem('economias') || '[{"mes":1,"ano":2025,"valor":697,"local":"Poupança"},{"mes":6,"ano":2024,"valor":200,"local":""},{"mes":7,"ano":2024,"valor":365,"local":""},{"mes":9,"ano":2024,"valor":104.06,"local":""},{"mes":10,"ano":2024,"valor":808.2,"local":""},{"mes":11,"ano":2024,"valor":400,"local":""}]');
+let currentAno = 2025;
+
+function fmt(v) {
+  return 'R$ ' + Math.abs(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  event.target.classList.add('active');
+  if(id === 'historico') renderHistorico();
+  if(id === 'resumo') updateResumo();
+  if(id === 'economia') renderEconomia();
+  if(id === 'lancamentos') renderLancamentos();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== RESUMO =====
+function updateResumo() {
+  const now = new Date();
+  const m = MESES_NOME[now.getMonth()];
+  const dados26 = DADOS_2026[m];
+  const totalEco = economias.reduce((a,e) => a + e.valor, 0);
+
+  // Soma lançamentos do mês atual
+  const mesAtual = now.getMonth() + 1;
+  const anoAtual = now.getFullYear();
+  const lancMes = lancamentos.filter(l => {
+    const d = new Date(l.data);
+    return d.getMonth()+1 === mesAtual && d.getFullYear() === anoAtual;
+  });
+  const extEntradas = lancMes.filter(l=>l.tipo==='entrada').reduce((a,l)=>a+l.valor,0);
+  const extSaidas = lancMes.filter(l=>l.tipo==='saida').reduce((a,l)=>a+l.valor,0);
+
+  const entradas = (dados26 ? dados26.e : 0) + extEntradas;
+  const saidas = (dados26 ? dados26.s : 0) + extSaidas;
+  const saldo = entradas - saidas;
+
+  document.getElementById('saldo-atual').textContent = fmt(saldo);
+  document.getElementById('saldo-atual').className = 'card-value ' + (saldo >= 0 ? 'green' : 'red');
+  document.getElementById('entradas-mes').textContent = fmt(entradas);
+  document.getElementById('saidas-mes').textContent = fmt(saidas);
+  document.getElementById('economia-total').textContent = fmt(totalEco);
+
+  const pctGasto = entradas > 0 ? Math.min(100, (saidas/entradas)*100) : 0;
+  const pctEco = entradas > 0 ? Math.min(100, (totalEco/12/entradas)*100) : 0;
+  document.getElementById('pct-gasto').textContent = pctGasto.toFixed(0) + '%';
+  document.getElementById('pct-eco').textContent = pctEco.toFixed(0) + '%';
+  const bg = document.getElementById('bar-gasto');
+  bg.style.width = pctGasto + '%';
+  bg.className = 'progress-fill' + (pctGasto > 80 ? ' danger' : pctGasto > 60 ? ' warning' : '');
+  document.getElementById('bar-eco').style.width = pctEco + '%';
+
+  // Chart 2025
+  renderBarChart('main-chart', DADOS_2025, 130);
+
+  // Últimos
+  const all = [...lancamentos].sort((a,b) => new Date(b.data)-new Date(a.data)).slice(0,8);
+  const tbody = document.getElementById('ultimos-lancamentos');
+  if(all.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum lançamento ainda</td></tr>';
+    return;
+  }
+  tbody.innerHTML = all.map(l => `
+    <tr>
+      <td>${new Date(l.data+'T12:00:00').toLocaleDateString('pt-BR')}</td>
+      <td>${l.desc || '—'}</td>
+      <td><span class="badge ${l.tipo}">${l.tipo}</span></td>
+      <td style="color:${l.tipo==='entrada'?'var(--accent)':'var(--danger)'}">${fmt(l.valor)}</td>
+    </tr>`).join('');
+
+  document.getElementById('currentDate').innerHTML = now.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+function renderBarChart(id, dados, maxH) {
+  const el = document.getElementById(id);
+  const vals = MESES_NOME.map(m => dados[m] || {e:0,s:0});
+  const maxV = Math.max(...vals.map(v => Math.max(v.e, v.s)), 1);
+  el.innerHTML = MESES_NOME.map((m,i) => {
+    const v = vals[i];
+    const he = Math.max(3, (v.e/maxV)*maxH);
+    const hs = Math.max(3, (v.s/maxV)*maxH);
+    return `<div class="bar-group">
+      <div class="bar-pair">
+        <div class="bar entrada" style="height:${he}px" title="Entrada: ${fmt(v.e)}"></div>
+        <div class="bar saida" style="height:${hs}px" title="Saída: ${fmt(v.s)}"></div>
+      </div>
+      <div class="bar-label">${m}</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== LANÇAMENTOS =====
+function addLancamento() {
+  const data = document.getElementById('lanc-data').value;
+  const tipo = document.getElementById('lanc-tipo').value;
+  const valor = parseFloat(document.getElementById('lanc-valor').value);
+  const desc = document.getElementById('lanc-desc').value;
+  const quem = document.getElementById('lanc-quem').value;
+  const mes = document.getElementById('lanc-mes').value;
+
+  if(!data || !valor || valor <= 0) { showToast('❌ Preencha data e valor!'); return; }
+
+  lancamentos.push({id: Date.now(), data, tipo, valor, desc, quem, mes: parseInt(mes)});
+  localStorage.setItem('lancamentos', JSON.stringify(lancamentos));
+  showToast('✅ Lançamento adicionado!');
+  document.getElementById('lanc-valor').value = '';
+  document.getElementById('lanc-desc').value = '';
+  renderLancamentos();
+}
+
+function removeLancamento(id) {
+  lancamentos = lancamentos.filter(l => l.id !== id);
+  localStorage.setItem('lancamentos', JSON.stringify(lancamentos));
+  renderLancamentos();
+  showToast('🗑️ Removido');
+}
+
+function renderLancamentos() {
+  const filterMes = document.getElementById('filter-mes').value;
+  const filterTipo = document.getElementById('filter-tipo').value;
+  let list = [...lancamentos];
+  if(filterMes) list = list.filter(l => l.mes == filterMes);
+  if(filterTipo) list = list.filter(l => l.tipo === filterTipo);
+  list.sort((a,b) => new Date(b.data)-new Date(a.data));
+
+  const tbody = document.getElementById('lista-lancamentos');
+  if(list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum lançamento encontrado</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(l => `
+    <tr>
+      <td>${new Date(l.data+'T12:00:00').toLocaleDateString('pt-BR')}</td>
+      <td>${l.desc || '—'}</td>
+      <td><span class="badge ${l.tipo}">${l.tipo}</span></td>
+      <td style="font-size:11px;color:var(--muted)">${l.quem}</td>
+      <td style="color:${l.tipo==='entrada'?'var(--accent)':'var(--danger)'}">${fmt(l.valor)}</td>
+      <td><button class="btn danger" style="padding:4px 10px;font-size:11px;" onclick="removeLancamento(${l.id})">×</button></td>
+    </tr>`).join('');
+}
+
+// ===== HISTÓRICO =====
+function setAno(ano, el) {
+  currentAno = ano;
+  document.querySelectorAll('.year-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderHistorico();
+}
+
+function renderHistorico() {
+  const dados = ALL_DATA[currentAno];
+  document.getElementById('hist-title').textContent = `Fluxo de ${currentAno}`;
+  renderBarChart('hist-chart', dados, 120);
+
+  const grid = document.getElementById('month-grid');
+  grid.innerHTML = MESES_NOME.map((m,i) => {
+    const v = dados[m];
+    const saldo = v.e - v.s;
+    return `<div class="month-card">
+      <div class="month-name">${MESES_FULL[i]}</div>
+      <div class="month-stat">Entradas <span style="color:var(--accent)">${fmt(v.e)}</span></div>
+      <div class="month-stat">Saídas <span style="color:var(--danger)">${fmt(v.s)}</span></div>
+      <div class="month-stat">Saldo <span style="color:${saldo>=0?'var(--accent)':'var(--danger)'}">${fmt(saldo)}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ===== ECONOMIA =====
+function addEconomia() {
+  const mes = parseInt(document.getElementById('eco-mes').value);
+  const ano = parseInt(document.getElementById('eco-ano').value);
+  const valor = parseFloat(document.getElementById('eco-valor').value);
+  const local = document.getElementById('eco-local').value;
+  if(!valor || valor <= 0) { showToast('❌ Informe o valor!'); return; }
+  economias.push({id: Date.now(), mes, ano, valor, local});
+  localStorage.setItem('economias', JSON.stringify(economias));
+  showToast('✅ Economia registrada!');
+  document.getElementById('eco-valor').value = '';
+  document.getElementById('eco-local').value = '';
+  renderEconomia();
+}
+
+function removeEconomia(id) {
+  economias = economias.filter(e => e.id !== id);
+  localStorage.setItem('economias', JSON.stringify(economias));
+  renderEconomia();
+  showToast('🗑️ Removido');
+}
+
+function renderEconomia() {
+  const total = economias.reduce((a,e) => a+e.valor, 0);
+  const e2024 = economias.filter(e => e.ano === 2024).reduce((a,e) => a+e.valor, 0);
+  const e2025 = economias.filter(e => e.ano === 2025).reduce((a,e) => a+e.valor, 0);
+  document.getElementById('eco-2024').textContent = fmt(e2024);
+  document.getElementById('eco-2025').textContent = fmt(e2025);
+  document.getElementById('eco-total').textContent = fmt(total);
+
+  const sorted = [...economias].sort((a,b) => b.ano - a.ano || b.mes - a.mes);
+  const tbody = document.getElementById('lista-economia');
+  if(sorted.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhuma economia registrada</td></tr>'; return; }
+  tbody.innerHTML = sorted.map(e => `
+    <tr>
+      <td>${MESES_FULL[e.mes-1]}/${e.ano}</td>
+      <td style="color:var(--accent)">${fmt(e.valor)}</td>
+      <td style="color:var(--muted)">${e.local || '—'}</td>
+      <td><button class="btn danger" style="padding:4px 10px;font-size:11px;" onclick="removeEconomia(${e.id})">×</button></td>
+    </tr>`).join('');
+}
+
+// ===== INIT =====
+const now = new Date();
+document.getElementById('lanc-data').value = now.toISOString().split('T')[0];
+document.getElementById('lanc-mes').value = now.getMonth() + 1;
+document.getElementById('eco-mes').value = now.getMonth() + 1;
+document.getElementById('currentDate').innerHTML = now.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+updateResumo();
+renderLancamentos();
+renderEconomia();
+renderHistorico();
+</script>
+</body>
+</html>
